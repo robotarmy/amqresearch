@@ -48,7 +48,7 @@ sending_loop(Channel,Q,Count) ->
   io:format("loop ~p", [Count]),
   %% Publish a message
   Payload = erlang:list_to_binary(io_lib:format("~s ~b",[<<"Foobar ">>,Count])),
-  io:format("~p",[Payload]),
+  io:format("~n ~p ~p~n",[Payload,Q]),
   Publish = #'basic.publish'{exchange = <<>>, routing_key = Q},
  What =  amqp_channel:cast(Channel, Publish, #amqp_msg{payload = Payload}),
   io:format("~p ~n",[What]),
@@ -56,7 +56,7 @@ sending_loop(Channel,Q,Count) ->
   timer:sleep(1000),
   Next = Count + 1,
 
-  sending_loop(Channel,Publish,Next).
+  sending_loop(Channel,Q,Next).
 
 boot_send() ->
   Loop = fun() -> start_sending() end,
