@@ -4,7 +4,7 @@
 -include("../deps/amqp_client-3.3.5/include/amqp_client.hrl").
 
 
--export([sending_loop/3,start_sending/0]).
+-export([sending_loop/3,boot_send/0]).
 -export([start_link/0]).
 -export([init/1]).
 
@@ -45,15 +45,22 @@ sending_loop(_,_,10) ->
   {ok, loop_terminated};
 
 sending_loop(Channel,Q,Count) ->
+  io:format("loop ~p", [Count]),
   %% Publish a message
   Payload = erlang:list_to_binary(io_lib:format("~s ~b",[<<"Foobar ">>,Count])),
+  io:format("~p",[Payload]),
   Publish = #'basic.publish'{exchange = <<>>, routing_key = Q},
-  amqp_channel:cast(Channel, Publish, #amqp_msg{payload = Payload}),
+ What =  amqp_channel:cast(Channel, Publish, #amqp_msg{payload = Payload}),
+  io:format("~p ~n",[What]),
   % wait a few seconds before pushing in another message
   timer:sleep(1000),
   Next = Count + 1,
 
   sending_loop(Channel,Publish,Next).
 
+boot_send() ->
+  Loop = fun() -> start_sending() end,
+  spawn(Loop).
+  
 init([]) ->
-  start_sending().
+	{ok, {{one_for_one, 1, 5}, []}}.
