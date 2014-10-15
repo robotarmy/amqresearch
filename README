@@ -1,0 +1,21 @@
+This is my first supervised worker process in erlang.
+It is not clear how to implement a background supervised worker
+properly.. I have hacked into the init a link on a spawned function.
+
+I am not sure what the 'otp' way to do this is.
+
+I made this to assist in getting feedback
+
+
+
+starting app
+
+ERL_LIBS=deps erl -pa ebin -s sender_app
+
+# manually stop in console
+application:stop(sender).
+
+# manually start again in console.
+application:start(sender).
+
+
